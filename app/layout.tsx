@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'Bienvenidos al Amazon',
+  title: 'Una boda salvaje',
   description: 'Una experiencia interactiva con Three.js',
 }
 

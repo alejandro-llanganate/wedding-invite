@@ -917,7 +917,7 @@ export default function Home() {
                               <div className="whatsapp-contact-item">
                                 <span className="whatsapp-contact-label">Sarela Wedding:</span>
                                 <a
-                                  href="https://wa.me/593969322162?text=Hola%2C%20tengo%20una%20duda%20sobre%20la%20boda"
+                                  href="https://wa.me/593969322162?text=Hola%2C%20tengo%20una%20duda%20sobre%20la%20boda%20salvaje"
                                   target="_blank"
                                   rel="noopener noreferrer"
                                   className="whatsapp-link"
@@ -928,7 +928,7 @@ export default function Home() {
                               <div className="whatsapp-contact-item">
                                 <span className="whatsapp-contact-label">Novios:</span>
                                 <a
-                                  href="https://wa.me/593983168080?text=Hola%2C%20tengo%20una%20duda%20sobre%20la%20boda"
+                                  href="https://wa.me/593983168080?text=Hola%2C%20tengo%20una%20duda%20sobre%20la%20boda%20salvaje"
                                   target="_blank"
                                   rel="noopener noreferrer"
                                   className="whatsapp-link"
