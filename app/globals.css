@@ -2525,6 +2525,17 @@ a {
   font-style: italic;
 }
 
+.gifts-section-transfer-note {
+  font-size: 1.1rem;
+  color: #5a4a3a;
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px dashed rgba(212, 165, 116, 0.5);
+  text-align: center;
+  font-weight: 500;
+  line-height: 1.6;
+}
+
 .gifts-section-hotel-image {
   margin: 2rem 0;
   display: flex;
@@ -2991,6 +3002,12 @@ a {
 
   .gifts-section-transfer-amount {
     font-size: 1rem;
+  }
+
+  .gifts-section-transfer-note {
+    font-size: 1rem;
+    margin-top: 1.2rem;
+    padding-top: 1.2rem;
   }
 
   .recommendations-section {

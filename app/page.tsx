@@ -883,7 +883,7 @@ export default function Home() {
                           <p className="gifts-section-content">
                             El desayuno y almuerzo de ambos días, así como el transporte desde Quito ida y vuelta para quienes lo necesiten, corren por nuestra cuenta.
                             Si alguien tiene alguna dificultad o desea comentarnos algo sobre el pago, no duden en escribirnos por mensaje interno.
-                            La fecha límite para realizar el pago es el <strong>12 de enero de 2026</strong>.
+                            La fecha límite para realizar el pago es hasta el <strong>15 de enero de 2026</strong>.
                           </p>
                           <div className="gifts-section-transfer">
                             <p className="gifts-section-transfer-title">Información de Transferencia</p>
@@ -894,6 +894,9 @@ export default function Home() {
                               <p className="gifts-section-bank-name"><strong>Tipo de Cuenta:</strong> Ahorros</p>
                               <p className="gifts-section-bank-name"><strong>Número de Cuenta:</strong> 2209956610</p>
                             </div>
+                            <p className="gifts-section-transfer-note">
+                              Por favor, enviar el comprobante a la persona que les hizo llegar el mensaje.
+                            </p>
                           </div>
 
                           {/* Sección de Recomendaciones */}
