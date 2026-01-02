@@ -3,7 +3,7 @@ import './globals.css'
 
 export const metadata: Metadata = {
   title: 'Una boda salvaje',
-  description: 'Una experiencia interactiva con Three.js',
+  description: 'Dos mejor que uno',
 }
 
 export default function RootLayout({
