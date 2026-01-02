@@ -139,6 +139,8 @@ export default function Home() {
   const [adventureAccepted, setAdventureAccepted] = useState(false)
   const [buttonClicked, setButtonClicked] = useState<string | null>(null)
   const [showImportantNote, setShowImportantNote] = useState(false)
+  const [showFinalAdventure, setShowFinalAdventure] = useState(false)
+  const [showFinalImage, setShowFinalImage] = useState(false)
 
   const handleAdventureClick = (buttonType: string) => {
     setButtonClicked(buttonType)
@@ -742,6 +744,24 @@ export default function Home() {
                           </p>
                         </div>
 
+                        {/* Imagen del lugar */}
+                        <div className="location-image-container">
+                          <Image
+                            src="/g_indichuris_101.jpg"
+                            alt="Mirador de Indichuris - Vista panorámica de la selva amazónica"
+                            width={800}
+                            height={600}
+                            style={{
+                              objectFit: 'cover',
+                              borderRadius: '12px',
+                              boxShadow: '0 8px 24px rgba(0, 0, 0, 0.15)',
+                              width: '100%',
+                              height: 'auto'
+                            }}
+                            quality={90}
+                          />
+                        </div>
+
                         {/* Código de vestimenta completo */}
                         <div className="dress-code-section">
                           <h2 className="dress-code-main-title">CÓDIGO DE VESTIMENTA</h2>
@@ -787,7 +807,7 @@ export default function Home() {
                                 <li>VESTIDOS LIGEROS</li>
                                 <li>ENTERIZOS LIGEROS</li>
                                 <li>ZAPATILLAS O SANDALIAS COMODAS</li>
-                                <li>OPCIONAL LLEVAR TACONES BAJO APARTE PARA LA FOTO</li>
+                                <li>OPCIONAL LLEVAR TACONES BAJOS APARTE PARA LA FOTO</li>
                               </ul>
                             </div>
                           </div>
@@ -838,8 +858,29 @@ export default function Home() {
 
                           </p>
                           <p className="gifts-section-content">
+                            <strong>Si eres un invitado que:</strong>
+                          </p>
+                          <ul style={{ marginLeft: '0', paddingLeft: '1.5rem', marginTop: '0.5rem', marginBottom: '0.5rem', textAlign: 'left' }}>
+                            <li style={{ marginBottom: '0.5rem', textAlign: 'left' }}>Va en su propio auto</li>
+                            <li style={{ marginBottom: '0.5rem', textAlign: 'left' }}>Solo acude a la ceremonia</li>
+                            <li style={{ marginBottom: '0.5rem', textAlign: 'left' }}>Se hospedará en otro lado sin estar presente en todo el itinerario</li>
+                          </ul>
+                          <p className="gifts-section-content">
+                            <strong>Por favor avísanos con anticipación</strong>
+                          </p>
+                          <hr style={{
+                            border: 'none',
+                            borderTop: '2px solid rgba(212, 165, 116, 0.4)',
+                            margin: '2rem 0',
+                            width: '100%'
+                          }} />
+                          <p className="gifts-section-content">
                             Con mucho cariño, queremos contarles que nosotros nos encargamos de todos los costos de la boda y de la logística, incluida la reserva del hotel.
+                          </p>
+                          <p className="gifts-section-content">
                             Solo les pedimos cubrir el valor del hospedaje, que es de <strong>USD 65</strong> por persona, mediante el pago a la cuenta indicada.
+                          </p>
+                          <p className="gifts-section-content">
                             El desayuno y almuerzo de ambos días, así como el transporte desde Quito ida y vuelta para quienes lo necesiten, corren por nuestra cuenta.
                             Si alguien tiene alguna dificultad o desea comentarnos algo sobre el pago, no duden en escribirnos por mensaje interno.
                             La fecha límite para realizar el pago es el <strong>12 de enero de 2026</strong>.
@@ -854,6 +895,67 @@ export default function Home() {
                               <p className="gifts-section-bank-name"><strong>Número de Cuenta:</strong> 2209956610</p>
                             </div>
                           </div>
+
+                          {/* Sección de Recomendaciones */}
+                          <div className="recommendations-section">
+                            <h2 className="recommendations-title">Recomendaciones para disfrutar al máximo nuestra boda:</h2>
+                            <ul className="recommendations-list">
+                              <li>Llevar sombrero o gorra, repelente y protector solar.</li>
+                              <li>Usar ropa y zapatos cómodos, adecuados para el clima y las actividades.</li>
+                              <li>Para las invitadas: al llegar no habrá mucho tiempo para arreglarse, especialmente el cabello, por lo que sugerimos salir desde Quito con el peinado ya listo o semiarreglado.</li>
+                              <li>Dormir bien la noche anterior, ya que la salida desde Quito será en horas de la madrugada, aproximadamente a las 3:00 a.m.</li>
+                              <li>Les pedimos su predisposición para cumplir con el itinerario y los horarios establecidos, ya que nos movilizaremos todos en un solo transporte y así evitaremos atrasos.</li>
+                            </ul>
+                          </div>
+
+                          {/* Sección de Contacto WhatsApp */}
+                          <div className="whatsapp-contact-section">
+                            <p className="whatsapp-contact-text">
+                              Si tienes alguna duda escríbenos por WhatsApp a:
+                            </p>
+                            <div className="whatsapp-contacts">
+                              <div className="whatsapp-contact-item">
+                                <span className="whatsapp-contact-label">Sarela Wedding:</span>
+                                <a
+                                  href="https://wa.me/593969322162?text=Hola%2C%20tengo%20una%20duda%20sobre%20la%20boda"
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="whatsapp-link"
+                                >
+                                  +593 96 932 2162
+                                </a>
+                              </div>
+                              <div className="whatsapp-contact-item">
+                                <span className="whatsapp-contact-label">Novios:</span>
+                                <a
+                                  href="https://wa.me/593983168080?text=Hola%2C%20tengo%20una%20duda%20sobre%20la%20boda"
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="whatsapp-link"
+                                >
+                                  +593 98 316 8080
+                                </a>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Botón final de aventura */}
+                          {adventureAccepted && !showFinalAdventure && (
+                            <div className="final-adventure-section">
+                              <p className="final-adventure-question">¿Estás listo para la aventura?</p>
+                              <button
+                                className="final-adventure-button"
+                                onClick={() => {
+                                  setShowFinalAdventure(true)
+                                  setTimeout(() => {
+                                    setShowFinalImage(true)
+                                  }, 500)
+                                }}
+                              >
+                                Sí
+                              </button>
+                            </div>
+                          )}
                         </div>
                       </div>
                     )}
@@ -934,6 +1036,38 @@ export default function Home() {
               </p>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Imagen final con efecto boom */}
+      {showFinalImage && (
+        <div
+          className="final-image-container"
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100vw',
+            height: '100vh',
+            zIndex: 1000,
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor: 'rgba(0, 0, 0, 0.9)',
+            animation: 'boomIn 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55)'
+          }}
+        >
+          <Image
+            src="/nuncatermina.jpeg"
+            alt="Un viaje que nunca termina"
+            fill
+            style={{
+              objectFit: 'contain',
+              padding: '2rem'
+            }}
+            quality={100}
+            priority
+          />
         </div>
       )}
     </main>
