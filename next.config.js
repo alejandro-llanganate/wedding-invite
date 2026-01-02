@@ -8,6 +8,11 @@ const nextConfig = {
         hostname: 'hotelecopark.com',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'www.disneyadvertising.com',
+        pathname: '/**',
+      },
     ],
   },
   webpack: (config) => {

@@ -4,14 +4,14 @@ import { Suspense, useState, useEffect } from 'react'
 import Scene from '@/components/Scene'
 import UI from '@/components/UI'
 import Image from 'next/image'
-import { 
+import {
   FaGift,
   FaHotel,
   FaExclamationTriangle,
   FaCalendarAlt,
   FaMapMarkerAlt
 } from 'react-icons/fa'
-import { 
+import {
   GiFlowerEmblem,
   GiBeveledStar
 } from 'react-icons/gi'
@@ -21,9 +21,9 @@ function DressCodeCarousel() {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [touchStart, setTouchStart] = useState(0)
   const [touchEnd, setTouchEnd] = useState(0)
-  
+
   const images = [
-    { src: '/persons/3.png', alt: 'Ejemplo vestimenta 1' },
+    { src: '/persons/2.png', alt: 'Ejemplo vestimenta 1' },
     { src: '/persons/4.png', alt: 'Ejemplo vestimenta 2' },
     { src: '/persons/5.png', alt: 'Ejemplo vestimenta 3' },
   ]
@@ -40,9 +40,10 @@ function DressCodeCarousel() {
     setCurrentIndex(index)
   }
 
-  // Manejo de gestos táctiles
+  // Manejo de gestos táctiles mejorado
   const handleTouchStart = (e: React.TouchEvent) => {
     setTouchStart(e.targetTouches[0].clientX)
+    setTouchEnd(e.targetTouches[0].clientX)
   }
 
   const handleTouchMove = (e: React.TouchEvent) => {
@@ -52,8 +53,9 @@ function DressCodeCarousel() {
   const handleTouchEnd = () => {
     if (!touchStart || !touchEnd) return
     const distance = touchStart - touchEnd
-    const isLeftSwipe = distance > 50
-    const isRightSwipe = distance < -50
+    const minSwipeDistance = 30 // Reducido para mayor sensibilidad
+    const isLeftSwipe = distance > minSwipeDistance
+    const isRightSwipe = distance < -minSwipeDistance
 
     if (isLeftSwipe) {
       nextImage()
@@ -61,13 +63,17 @@ function DressCodeCarousel() {
     if (isRightSwipe) {
       prevImage()
     }
+
+    // Reset
+    setTouchStart(0)
+    setTouchEnd(0)
   }
 
   return (
     <div className="dress-code-carousel">
-      <div 
+      <div
         className="carousel-container"
-        style={{ transform: `translateX(-${currentIndex * 100}%)` }}
+        style={{ transform: `translate3d(-${currentIndex * 100}%, 0, 0)` }}
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
@@ -87,7 +93,7 @@ function DressCodeCarousel() {
         ))}
       </div>
       <div className="carousel-controls">
-        <button 
+        <button
           className="carousel-button"
           onClick={prevImage}
           aria-label="Imagen anterior"
@@ -106,7 +112,7 @@ function DressCodeCarousel() {
             />
           ))}
         </div>
-        <button 
+        <button
           className="carousel-button"
           onClick={nextImage}
           aria-label="Siguiente imagen"
@@ -115,10 +121,10 @@ function DressCodeCarousel() {
           ›
         </button>
       </div>
-      <div style={{ 
-        textAlign: 'center', 
-        marginTop: '0.5rem', 
-        fontSize: '0.875rem', 
+      <div style={{
+        textAlign: 'center',
+        marginTop: '0.5rem',
+        fontSize: '0.875rem',
         color: '#8b7355',
         fontWeight: 500
       }}>
@@ -130,6 +136,17 @@ function DressCodeCarousel() {
 
 export default function Home() {
   const [scrollY, setScrollY] = useState(0)
+  const [adventureAccepted, setAdventureAccepted] = useState(false)
+  const [buttonClicked, setButtonClicked] = useState<string | null>(null)
+  const [showImportantNote, setShowImportantNote] = useState(false)
+
+  const handleAdventureClick = (buttonType: string) => {
+    setButtonClicked(buttonType)
+    setTimeout(() => {
+      setAdventureAccepted(true)
+      setButtonClicked(null)
+    }, 800) // Duración de la animación
+  }
 
   useEffect(() => {
     const handleScroll = () => {
@@ -188,7 +205,7 @@ export default function Home() {
   // Control de opacidad de imagen 2.png - desaparece junto con el loro
   const image2FadeOut = 400 // Tiempo para desaparecer
   const image2End = image1FadeOutStart + image2FadeOut // Desaparece al mismo tiempo que el loro
-  
+
   let image2Opacity = 0
   if (scrollY < image2Start) {
     image2Opacity = 0
@@ -207,11 +224,34 @@ export default function Home() {
   // Control de opacidad y posición del loro - desaparece antes de la niebla
   // Imagen pair.png aparece inmediatamente después del loro
   const pairImageStart = image1End + 50 // Aparece inmediatamente después del loro
-  const pairImageFadeIn = 800 // Más tiempo para que se dibuje bien
-  const pairImageDuration = windowHeight * 1.5 // Duración visible aumentada
-  const pairImageFadeOut = 400
+  const pairImageFadeIn = 300 // Tiempo para aparecer (rápido)
+  // Duración total ~7 segundos: fade in (0.3s) + visible (6.2s) + fade out (0.2s) = 7s
+  // Asumiendo scroll de ~100px/segundo, 620px = ~6.2 segundos
+  const pairImageDuration = 620 // Duración visible de ~6.2 segundos (3 segundos más que antes)
+  const pairImageFadeOut = 200 // Fade out muy rápido (0.2s)
   const pairImageEnd = pairImageStart + pairImageFadeIn + pairImageDuration + pairImageFadeOut
-  
+
+  // Sección de información de la boda con fondo blanco
+  // Transición suave con fade cruzado - la carta empieza a aparecer mientras la imagen desaparece
+  const overlapStart = pairImageStart + pairImageFadeIn + pairImageDuration * 0.5 // Empieza cuando la imagen está al 50%
+  const weddingInfoFadeIn = 1200 // Fade in suave y largo para transición gradual
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768
+
+  // Una vez que la carta aparece, se mantiene visible permanentemente
+  let weddingInfoOpacity = 0
+  if (scrollY < overlapStart) {
+    weddingInfoOpacity = 0
+  } else if (scrollY < overlapStart + weddingInfoFadeIn) {
+    weddingInfoOpacity = Math.min(1, (scrollY - overlapStart) / weddingInfoFadeIn)
+  } else {
+    // Una vez que aparece completamente, se mantiene en 1
+    weddingInfoOpacity = 1
+  }
+
+  // Mostrar la carta cuando tiene opacidad suficiente
+  const shouldShowWeddingInfo = weddingInfoOpacity > 0.05
+
+  // Calcular opacidad de la imagen con fade cruzado suave
   let pairImageOpacity = 0
   if (scrollY < pairImageStart) {
     pairImageOpacity = 0
@@ -226,30 +266,13 @@ export default function Home() {
     pairImageOpacity = 0
   }
 
-  // Sección de información de la boda con fondo blanco
-  const weddingInfoStart = pairImageEnd + 200
-  const weddingInfoFadeIn = 600
-  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768
-  
-  // Una vez que la carta aparece, se mantiene visible permanentemente
-  let weddingInfoOpacity = 0
-  if (scrollY < weddingInfoStart) {
-    weddingInfoOpacity = 0
-  } else if (scrollY < weddingInfoStart + weddingInfoFadeIn) {
-    weddingInfoOpacity = Math.min(1, (scrollY - weddingInfoStart) / weddingInfoFadeIn)
-  } else {
-    // Una vez que aparece completamente, se mantiene en 1
-    weddingInfoOpacity = 1
+  // Fade cruzado suave: cuando la carta empieza a aparecer, la imagen desaparece gradualmente
+  if (weddingInfoOpacity > 0.05) {
+    // Calcular el progreso del fade cruzado (de 0 a 1)
+    const crossFadeProgress = Math.min(1, weddingInfoOpacity / 0.6) // Cuando weddingInfo llega a 0.6, la imagen desaparece
+    pairImageOpacity = Math.max(0, pairImageOpacity * (1 - crossFadeProgress))
   }
-  
-  // Mostrar la carta cuando tiene opacidad suficiente
-  const shouldShowWeddingInfo = weddingInfoOpacity > 0.05
-  
-  // Forzar que pairImage se oculte cuando aparece la carta de la boda
-  if (weddingInfoOpacity > 0) {
-    pairImageOpacity = 0
-  }
-  
+
   let image1Opacity = 1
   let image1TranslateY = windowHeight
 
@@ -274,7 +297,7 @@ export default function Home() {
   }
 
   // Nieve aparece después de la información de la boda (después de que la carta esté completamente visible)
-  const weddingInfoFullyVisible = weddingInfoStart + weddingInfoFadeIn
+  const weddingInfoFullyVisible = overlapStart + weddingInfoFadeIn
   const snowStart = weddingInfoFullyVisible + 200
   const snowFadeIn = 400
   const snowDuration = windowHeight * 1.5
@@ -294,13 +317,13 @@ export default function Home() {
   // Ocultar canvas cuando aparece la carta de la boda (ocultar completamente desde el inicio)
   const canvasOpacity = weddingInfoOpacity > 0 ? 0 : 1
   const canvasVisibility = weddingInfoOpacity > 0 ? 'hidden' : 'visible'
-  
+
   // Ocultar todas las imágenes anteriores cuando aparece la carta
   const shouldHidePreviousImages = weddingInfoOpacity > 0
 
   return (
     <main>
-      <div 
+      <div
         id="canvas-container"
         className={canvasOpacity === 0 ? 'hidden' : ''}
         style={{
@@ -334,6 +357,28 @@ export default function Home() {
           }}
         >
           <div className="intro-quote">
+            <h1 className="intro-title">ECUADOR</h1>
+            <h2 className="intro-subtitle">Boda Salvaje</h2>
+            <div className="intro-natgeo">
+              <span className="intro-natgeo-text">By</span>
+              <div className="intro-natgeo-logo">
+                <Image
+                  src="https://www.disneyadvertising.com/app/uploads/2023/09/das_nat-geo_nat-geo_logo_KO-uai-720x405-1.png"
+                  alt="National Geographic"
+                  width={240}
+                  height={135}
+                  style={{
+                    objectFit: 'contain',
+                    width: '100%',
+                    height: 'auto',
+                    display: 'block'
+                  }}
+                  quality={100}
+                  priority
+                  unoptimized={false}
+                />
+              </div>
+            </div>
             <p className="intro-quote-text">
               La Amazonía es la selva tropical más grande y con mayor biodiversidad del planeta.
             </p>
@@ -531,7 +576,7 @@ export default function Home() {
 
         {/* Overlay de fondo sólido para ocultar el canvas completamente - debe estar fuera de la sección */}
         {shouldShowWeddingInfo && (
-          <div 
+          <div
             className="wedding-info-overlay"
             style={{
               position: 'fixed',
@@ -541,9 +586,9 @@ export default function Home() {
               height: '100vh',
               background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
               zIndex: 24,
-              opacity: 1,
+              opacity: weddingInfoOpacity,
               pointerEvents: 'none',
-              transition: 'opacity 0.6s ease-in-out',
+              transition: 'opacity 1s ease-in-out',
               display: 'block'
             }}
           />
@@ -551,252 +596,283 @@ export default function Home() {
 
         {/* Sección de información de la boda con animación de invitación */}
         {shouldShowWeddingInfo && (
-        <div
-          className="wedding-info-section"
-          style={{
-            opacity: 1,
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            width: '100vw',
-            height: '100vh',
-            zIndex: 25,
-            pointerEvents: weddingInfoOpacity > 0.5 ? 'auto' : 'none',
-            transition: 'opacity 0.6s ease-in-out',
-            overflow: weddingInfoOpacity > 0.5 ? 'auto' : 'hidden',
-            display: 'flex',
-            alignItems: weddingInfoOpacity > 0.5 ? 'flex-start' : 'center',
-            justifyContent: 'center',
-            visibility: 'visible',
-            background: 'transparent',
-            paddingTop: weddingInfoOpacity > 0.5 ? '2rem' : '0'
-          }}
-        >
-          {/* Sobre cerrado que se abre */}
-          {weddingInfoOpacity > 0 && (
-            <div 
-              className="envelope-container" 
-              style={{ 
-                position: 'relative', 
-                zIndex: 2, 
-                width: '100%', 
-                height: '100%',
-                opacity: 1,
-                visibility: 'visible',
-                pointerEvents: weddingInfoOpacity > 0.5 ? 'auto' : 'none',
-                overflow: weddingInfoOpacity > 0.5 ? 'visible' : 'hidden'
-              }}
-            >
-            <div className="envelope">
-              <div className="envelope-back"></div>
-              <div className="envelope-front">
-                <div className="envelope-flap"></div>
-              </div>
-            </div>
-            
-            {/* Carta que aparece después de abrirse el sobre */}
-            <div className={`wedding-letter ${weddingInfoOpacity > 0.7 ? 'letter-visible' : ''}`}>
-              <div className="letter-paper scrollable-letter">
-                {/* Decoración superior */}
-                <div className="letter-header-decoration">
-                  <div className="decoration-line"></div>
-                  <div className="decoration-flower">
-                    <GiFlowerEmblem />
+          <div
+            className="wedding-info-section"
+            style={{
+              opacity: 1,
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              width: '100vw',
+              height: '100vh',
+              zIndex: 25,
+              pointerEvents: weddingInfoOpacity > 0.5 ? 'auto' : 'none',
+              transition: 'opacity 0.6s ease-in-out',
+              overflow: weddingInfoOpacity > 0.5 ? 'auto' : 'hidden',
+              display: 'flex',
+              alignItems: weddingInfoOpacity > 0.5 ? 'flex-start' : 'center',
+              justifyContent: 'center',
+              visibility: 'visible',
+              background: 'transparent',
+              paddingTop: weddingInfoOpacity > 0.5 ? '2rem' : '0'
+            }}
+          >
+            {/* Sobre cerrado que se abre */}
+            {weddingInfoOpacity > 0 && (
+              <div
+                className="envelope-container"
+                style={{
+                  position: 'relative',
+                  zIndex: 2,
+                  width: '100%',
+                  height: '100%',
+                  opacity: 1,
+                  visibility: 'visible',
+                  pointerEvents: weddingInfoOpacity > 0.5 ? 'auto' : 'none',
+                  overflow: weddingInfoOpacity > 0.5 ? 'visible' : 'hidden'
+                }}
+              >
+                <div className="envelope">
+                  <div className="envelope-back"></div>
+                  <div className="envelope-front">
+                    <div className="envelope-flap"></div>
                   </div>
-                  <div className="decoration-line"></div>
                 </div>
-                
-                {/* Título principal */}
-                <h1 className="letter-main-title">Invitación de Boda</h1>
-                
-                {/* Decoración central */}
-                <div className="letter-divider">
-                  <GiBeveledStar />
-                </div>
-                
-                {/* Información de la boda */}
-                <div className="letter-content">
-                  {/* Fechas */}
-                  <div className="letter-info-item">
-                    <div className="letter-icon">
-                      <FaCalendarAlt />
-                    </div>
-                    <div className="letter-info-text">
-                      <h3 className="letter-label">Fecha</h3>
-                      <p className="letter-date">Sábado 31 de Enero</p>
-                      <p className="letter-date">Domingo 01 de Febrero</p>
-              </div>
-            </div>
 
-            {/* Lugar */}
-                  <div className="letter-info-item">
-                    <div className="letter-icon">
-                      <FaMapMarkerAlt />
-                    </div>
-                    <div className="letter-info-text">
-                      <h3 className="letter-label">Lugar</h3>
-                      <p className="letter-location">Mirador de Indichuris</p>
-                      <p className="letter-location-detail">Puyo, Ecuador</p>
-              </div>
-            </div>
-
-                  {/* Descripción */}
-                  <div className="letter-description">
-                    <p className="letter-description-text">
-                El Mirador de Indichuris es un lugar mágico ubicado en las alturas de Puyo, 
-                que ofrece una vista panorámica impresionante de la selva amazónica y el río Pastaza. 
-                Este mirador elevado te permite contemplar la inmensidad de la naturaleza desde una 
-                perspectiva única, rodeado de la exuberante vegetación y los sonidos de la selva. 
-                Es el escenario perfecto para celebrar este momento especial, donde la belleza natural 
-                se combina con la magia del amor.
-              </p>
-            </div>
-
-                  {/* Código de vestimenta completo */}
-                  <div className="dress-code-section">
-                    <h2 className="dress-code-main-title">CÓDIGO DE VESTIMENTA</h2>
-                    <h3 className="dress-code-subtitle">SEMI-FORMAL ELEGANTE</h3>
-                    <p className="dress-code-description">
-                      Queremos que luzcan espectaculares y cómodos para disfrutar de nuestra celebración al aire libre.
-                    </p>
-
-                    <div className="dress-code-content">
-                      {/* Sección ELLOS */}
-                      <div className="dress-code-gender-section">
-                        <h4 className="dress-code-gender-title">ELLOS</h4>
-                        <div className="dress-code-illustration">
-                          <Image
-                            src="/persons/1.png"
-                            alt="Ejemplo vestimenta caballero"
-                            width={200}
-                            height={300}
-                            style={{ objectFit: 'contain' }}
-                          />
-                        </div>
-                        <ul className="dress-code-list">
-                          <li>PANTALÓN FORMAL O DE LINO</li>
-                          <li>CAMISA LISA O CON TEXTURA SUTIL</li>
-                          <li>SACO OPCIONAL</li>
-                          <li>ZAPATOS FORMALES (NO TENIS)</li>
-                        </ul>
+                {/* Carta que aparece después de abrirse el sobre */}
+                <div className={`wedding-letter ${weddingInfoOpacity > 0.7 ? 'letter-visible' : ''}`}>
+                  <div className="letter-paper scrollable-letter">
+                    {/* Decoración superior */}
+                    <div className="letter-header-decoration">
+                      <div className="decoration-line"></div>
+                      <div className="decoration-flower">
+                        <GiFlowerEmblem />
                       </div>
-
-                      {/* Sección ELLAS */}
-                      <div className="dress-code-gender-section">
-                        <h4 className="dress-code-gender-title">ELLAS</h4>
-                        <div className="dress-code-illustration">
-                          <Image
-                            src="/persons/2.png"
-                            alt="Ejemplo vestimenta dama"
-                            width={200}
-                            height={300}
-                            style={{ objectFit: 'contain' }}
-                          />
-                        </div>
-                        <ul className="dress-code-list">
-                          <li>VESTIDOS MIDI O LARGOS</li>
-                          <li>ENTERIZOS ELEGANTES</li>
-                          <li>TACONES O SANDALIAS ELEGANTES</li>
-                          <li>ACCESORIOS A GUSTO</li>
-                        </ul>
-                      </div>
+                      <div className="decoration-line"></div>
                     </div>
 
-                    {/* Paleta de colores */}
-                    <div className="color-palette-section">
-                      <p className="color-palette-warning">EVITAR EL BLANCO</p>
-                      <div className="color-palette">
-                        <div className="color-circle" style={{ backgroundColor: '#8B4513' }}></div>
-                        <div className="color-circle" style={{ backgroundColor: '#F5DEB3' }}></div>
-                        <div className="color-circle" style={{ backgroundColor: '#A0522D' }}></div>
-                        <div className="color-circle" style={{ backgroundColor: '#654321' }}></div>
-                        <div className="color-circle" style={{ backgroundColor: '#2F4F4F' }}></div>
-                        <div className="color-circle" style={{ backgroundColor: '#556B2F' }}></div>
-                        <div className="color-circle" style={{ backgroundColor: '#8B0000' }}></div>
-                      </div>
+                    {/* Título principal */}
+                    <h1 className="letter-main-title">
+                      <span className="title-line-1">Boda Civil</span>
+                      <span className="title-line-2">en la Selva Ecuatoriana</span>
+                    </h1>
+
+                    {/* Decoración central */}
+                    <div className="letter-divider">
+                      <GiBeveledStar />
                     </div>
 
-                    {/* Carrusel de ejemplos de vestimenta */}
-                    <DressCodeCarousel />
-                  </div>
-
-                  {/* Sección de reserva de hotel */}
-                  <div className="hotel-section">
-                    <h2 className="hotel-section-title">
-                      <FaHotel className="hotel-icon" />
-                      RESERVA DE HOTEL
-                    </h2>
-                    <p className="hotel-section-important">
-                      <FaExclamationTriangle className="warning-icon" />
-                      MUY IMPORTANTE
-                    </p>
-                    <p className="hotel-section-content">
-                      Para garantizar tu comodidad y la de todos nuestros invitados, 
-                      es muy importante que reserves tu hospedaje con anticipación. 
-                      Puyo cuenta con varias opciones de alojamiento que te recomendamos 
-                      consultar y reservar lo antes posible para asegurar disponibilidad.
-                    </p>
-                  </div>
-
-                  {/* Sección de regalos */}
-                  <div className="gifts-section">
-                    <h2 className="gifts-section-title">
-                      <FaGift className="gift-icon" />
-                      REGALOS
-                    </h2>
-                    <div className="gifts-section-hotel-image">
-                      <Image
-                        src="https://hotelecopark.com/wp-content/uploads/2025/02/DJI_0943-1.jpeg"
-                        alt="Hotel Ekopark"
-                        width={600}
-                        height={400}
-                        style={{ 
-                          objectFit: 'cover',
-                          borderRadius: '12px',
-                          boxShadow: '0 8px 24px rgba(0, 0, 0, 0.15)'
-                        }}
-                      />
-                    </div>
-                    <p className="gifts-section-content">
-                      Tu presencia es el mejor regalo que podemos recibir. 
-                      Si deseas contribuir a nuestra celebración, tu regalo 
-                      puede ser ayudarnos con el pago del hospedaje en el 
-                      <strong> Hotel Ekopark</strong>, donde nos alojaremos durante 
-                      nuestra boda.
-                    </p>
-                    <p className="gifts-section-content">
-                      Cualquier contribución será de gran ayuda para hacer de este 
-                      momento aún más especial.
-                    </p>
-                    <div className="gifts-section-transfer">
-                      <p className="gifts-section-transfer-title">Información de Transferencia</p>
-                      <div className="gifts-section-bank-info">
-                        <p className="gifts-section-bank-name"><strong>Banco:</strong> Produbanco</p>
-                        <p className="gifts-section-bank-name"><strong>Titular:</strong> Estefany Illescas</p>
-                        <p className="gifts-section-bank-name"><strong>CI:</strong> 1725976755</p>
-                        <p className="gifts-section-bank-name"><strong>Tipo de Cuenta:</strong> Ahorros</p>
-                        <p className="gifts-section-transfer-amount"><strong>Número de Cuenta:</strong> 20003465207</p>
-                      </div>
-                      <p className="gifts-section-transfer-details">
-                        Puedes realizar tu transferencia por el monto que desees contribuir.
+                    <div className="adventure-question">
+                      <p className="adventure-question-text">
+                        Alejandro y Estefany, te invitamos a celebrar nuestra boda civil en la selva ecuatoriana.<br />
+                        ¿Estás listo para esta aventura?
                       </p>
+                      {!adventureAccepted ? (
+                        <div className="adventure-buttons">
+                          <button
+                            className={`adventure-btn adventure-btn-yes ${buttonClicked === 'yes' ? 'clicked' : ''}`}
+                            onClick={() => handleAdventureClick('yes')}
+                            disabled={buttonClicked !== null}
+                          >
+                            Sí
+                          </button>
+                          <button
+                            className={`adventure-btn adventure-btn-marluna ${buttonClicked === 'marluna' ? 'clicked' : ''}`}
+                            onClick={() => handleAdventureClick('marluna')}
+                            disabled={buttonClicked !== null}
+                          >
+                            De una
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="adventure-accepted">
+                          <p className="adventure-response">¡Perfecto! Nos vemos en la selva 🌿</p>
+                        </div>
+                      )}
                     </div>
+
+                    {/* Información de la boda - Solo visible después de aceptar */}
+                    {adventureAccepted && (
+                      <div className="letter-content">
+                        {/* Fechas */}
+                        <div className="letter-info-item">
+                          <div className="letter-icon">
+                            <FaCalendarAlt />
+                          </div>
+                          <div className="letter-info-text">
+                            <h3 className="letter-label">Fecha</h3>
+                            <p className="letter-date">Sábado 31 de Enero</p>
+                            <p className="letter-date">Domingo 01 de Febrero</p>
+                            <button
+                              className="important-note-button"
+                              onClick={() => setShowImportantNote(true)}
+                            >
+                              Nota importante
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Lugar */}
+                        <div className="letter-info-item">
+                          <div className="letter-icon">
+                            <FaMapMarkerAlt />
+                          </div>
+                          <div className="letter-info-text">
+                            <h3 className="letter-label">Lugar</h3>
+                            <p className="letter-location">Mirador de Indichuris</p>
+                            <p className="letter-location-detail">Puyo, Ecuador</p>
+                            <p className="letter-ceremony-time">Hora de la ceremonia: 2 PM</p>
+                            <a
+                              href="https://share.google/t5E77EmWGQQ6uYNnB"
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="letter-location-link"
+                            >
+                              Ver ubicación
+                            </a>
+                          </div>
+                        </div>
+
+                        {/* Descripción */}
+                        <div className="letter-description">
+                          <p className="letter-description-text">
+                            Un lugar mágico en las alturas de Puyo que ofrece una vista panorámica impresionante
+                            de la selva amazónica y el río Pastaza. El escenario perfecto para celebrar este
+                            momento especial, donde la belleza natural se combina con la magia del amor.
+                          </p>
+                        </div>
+
+                        {/* Código de vestimenta completo */}
+                        <div className="dress-code-section">
+                          <h2 className="dress-code-main-title">CÓDIGO DE VESTIMENTA</h2>
+                          <h3 className="dress-code-subtitle">CASUAL LIGERO</h3>
+                          <p className="dress-code-description">
+                            Queremos que luzcan espectaculares y cómodos para disfrutar de nuestra celebración al aire libre.
+                          </p>
+
+                          <div className="dress-code-content">
+                            {/* Sección ELLOS */}
+                            <div className="dress-code-gender-section">
+                              <h4 className="dress-code-gender-title">ELLOS</h4>
+                              <div className="dress-code-illustration">
+                                <Image
+                                  src="/persons/1.png"
+                                  alt="Ejemplo vestimenta caballero"
+                                  width={200}
+                                  height={300}
+                                  style={{ objectFit: 'contain' }}
+                                />
+                              </div>
+                              <ul className="dress-code-list">
+                                <li>PANTALÓN LIGERO</li>
+                                <li>CAMISA LISA O CON TEXTURA SUTIL</li>
+                                <li>SACO OPCIONAL</li>
+                                <li>ZAPATILLAS COMODAS</li>
+                              </ul>
+                            </div>
+
+                            {/* Sección ELLAS */}
+                            <div className="dress-code-gender-section">
+                              <h4 className="dress-code-gender-title">ELLAS</h4>
+                              <div className="dress-code-illustration">
+                                <Image
+                                  src="/persons/3.png"
+                                  alt="Ejemplo vestimenta dama"
+                                  width={200}
+                                  height={300}
+                                  style={{ objectFit: 'contain' }}
+                                />
+                              </div>
+                              <ul className="dress-code-list">
+                                <li>VESTIDOS LIGEROS</li>
+                                <li>ENTERIZOS LIGEROS</li>
+                                <li>ZAPATILLAS O SANDALIAS COMODAS</li>
+                                <li>OPCIONAL LLEVAR TACONES BAJO APARTE PARA LA FOTO</li>
+                              </ul>
+                            </div>
+                          </div>
+
+                          {/* Paleta de colores */}
+                          <div className="color-palette-section">
+                            <p className="color-palette-warning">
+                              PROHIBIDO EL<br />
+                              <span className="color-palette-warning-inline">BLANCO - BEIGE</span>
+                            </p>
+                            <p className="color-palette-terracota">Utilizar colores terracota en su vestimenta</p>
+                            <div className="color-palette">
+                              <div className="color-circle" style={{ backgroundColor: '#733F14' }}></div>
+                              <div className="color-circle" style={{ backgroundColor: '#95230B' }}></div>
+                              <div className="color-circle" style={{ backgroundColor: '#E67F05' }}></div>
+                              <div className="color-circle" style={{ backgroundColor: '#9D8308' }}></div>
+                            </div>
+                          </div>
+
+                          {/* Carrusel de ejemplos de vestimenta */}
+                          <p className="dress-code-referential-subtitle">Fotos referenciales</p>
+                          <DressCodeCarousel />
+                        </div>
+
+                        {/* Título antes de reserva de hotel */}
+                        <h2 className="gift-presence-title">Nuestro regalo es tu presencia</h2>
+
+                        {/* Sección de regalos */}
+                        <div className="gifts-section">
+                          <h2 className="gifts-section-title">
+                            HOSPEDAJE
+                          </h2>
+                          <div className="gifts-section-hotel-image">
+                            <Image
+                              src="https://hotelecopark.com/wp-content/uploads/2025/02/DJI_0943-1.jpeg"
+                              alt="Hotel Ekopark"
+                              width={600}
+                              height={400}
+                              style={{
+                                objectFit: 'cover',
+                                borderRadius: '12px',
+                                boxShadow: '0 8px 24px rgba(0, 0, 0, 0.15)'
+                              }}
+                            />
+                          </div>
+                          <p className="gifts-section-content">
+                            Tu presencia es el mejor regalo que podemos recibir. En esta ocasión tu regalo será ayudarnos con el pago de tu hospedaje en el hotel ECOPARK, donde todos nos alojaremos durante nuestra boda.
+
+                          </p>
+                          <p className="gifts-section-content">
+                            Con mucho cariño, queremos contarles que nosotros nos encargamos de todos los costos de la boda y de la logística, incluida la reserva del hotel.
+                            Solo les pedimos cubrir el valor del hospedaje, que es de <strong>USD 65</strong> por persona, mediante el pago a la cuenta indicada.
+                            El desayuno y almuerzo de ambos días, así como el transporte desde Quito ida y vuelta para quienes lo necesiten, corren por nuestra cuenta.
+                            Si alguien tiene alguna dificultad o desea comentarnos algo sobre el pago, no duden en escribirnos por mensaje interno.
+                            La fecha límite para realizar el pago es el <strong>12 de enero de 2026</strong>.
+                          </p>
+                          <div className="gifts-section-transfer">
+                            <p className="gifts-section-transfer-title">Información de Transferencia</p>
+                            <div className="gifts-section-bank-info">
+                              <p className="gifts-section-bank-name"><strong>Banco:</strong> Pichincha</p>
+                              <p className="gifts-section-bank-name"><strong>Titular:</strong> Estefany Illescas</p>
+                              <p className="gifts-section-bank-name"><strong>CI:</strong> 1725976755</p>
+                              <p className="gifts-section-bank-name"><strong>Tipo de Cuenta:</strong> Ahorros</p>
+                              <p className="gifts-section-bank-name"><strong>Número de Cuenta:</strong> 2209956610</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Decoración inferior */}
+                    {adventureAccepted && (
+                      <div className="letter-footer-decoration">
+                        <div className="decoration-line"></div>
+                        <div className="decoration-flower">
+                          <GiFlowerEmblem />
+                        </div>
+                        <div className="decoration-line"></div>
+                      </div>
+                    )}
                   </div>
-                </div>
-                
-                {/* Decoración inferior */}
-                <div className="letter-footer-decoration">
-                  <div className="decoration-line"></div>
-                  <div className="decoration-flower">
-                    <GiFlowerEmblem />
-                  </div>
-                  <div className="decoration-line"></div>
                 </div>
               </div>
-            </div>
+            )}
           </div>
-          )}
-        </div>
         )}
 
         {/* Efecto de nieve después de la información de la boda */}
@@ -829,6 +905,37 @@ export default function Home() {
           </div>
         </div>
       </div>
+
+      {/* Modal de Nota Importante */}
+      {showImportantNote && (
+        <div className="modal-overlay" onClick={() => setShowImportantNote(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <button
+              className="modal-close-button"
+              onClick={() => setShowImportantNote(false)}
+              aria-label="Cerrar"
+            >
+              ×
+            </button>
+            <h2 className="modal-title">Nota Importante</h2>
+            <div className="modal-body">
+              <p>
+                Contamos con un cronograma de actividades para el sábado (desde las 9 AM que será su hora de llegada al hotel) y domingo (hasta las 3 PM) que será su retorno a Quito.
+              </p>
+              <p>
+                El transporte ida y vuelta será cubierto por los novios para quienes lo requieran,
+                con salida el sábado en horas de la madrugada desde dos puntos de encuentro que
+                serán informados más adelante, considerando que el viaje tiene una duración
+                aproximada de 5 horas.
+              </p>
+              <p>
+                En caso de trasladarse en transporte propio, les pedimos comunicarlo previamente
+                hasta el 15 de enero a los novios.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   )
 }
